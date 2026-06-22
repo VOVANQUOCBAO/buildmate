@@ -1,6 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 
-import type { BuilderProfile, SavedAction } from "@/lib/types";
+import type { BuilderProfile, JourneyProgress, JourneyStatus, SavedAction } from "@/lib/types";
 import { createClient } from "./server";
 
 /**
@@ -26,6 +26,21 @@ type SavedActionRow = {
   action: string;
   saved_at: string;
 };
+
+type JourneyProgressRow = {
+  phase: string;
+  status: string;
+  updated_at: string;
+};
+
+const VALID_STATUSES: JourneyStatus[] = ["not_started", "in_progress", "done", "blocked"];
+
+function rowToJourneyProgress(row: JourneyProgressRow): JourneyProgress {
+  const status = (VALID_STATUSES as string[]).includes(row.status)
+    ? (row.status as JourneyStatus)
+    : "not_started";
+  return { phase: row.phase, status, updatedAt: row.updated_at };
+}
 
 export async function getCurrentUser(): Promise<User | null> {
   const supabase = await createClient();
@@ -176,4 +191,52 @@ export async function toggleSavedAction(
   }
 
   return { saved, actions: await listSavedActions() };
+}
+
+/** Lists the signed-in user's per-phase progress. [] in mock mode. */
+export async function listJourneyProgress(): Promise<JourneyProgress[]> {
+  const supabase = await createClient();
+  if (!supabase) return [];
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("journey_progress")
+    .select("phase, status, updated_at")
+    .eq("user_id", user.id);
+
+  if (error || !data) return [];
+  return (data as JourneyProgressRow[]).map(rowToJourneyProgress);
+}
+
+/**
+ * Upserts the status for one phase and returns the updated list.
+ * Returns null when there is no signed-in user (caller falls back to local).
+ */
+export async function setJourneyStatus(
+  phase: string,
+  status: JourneyStatus
+): Promise<{ progress: JourneyProgress[] } | null> {
+  const supabase = await createClient();
+  if (!supabase) return null;
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  await supabase.from("journey_progress").upsert(
+    {
+      user_id: user.id,
+      phase,
+      status,
+      updated_at: new Date().toISOString()
+    },
+    { onConflict: "user_id,phase" }
+  );
+
+  return { progress: await listJourneyProgress() };
 }
