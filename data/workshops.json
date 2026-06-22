@@ -1,0 +1,48 @@
+[
+  {
+    "id": "agent-workflow-lab",
+    "title": "Agent Workflow Lab",
+    "tags": ["agents", "workflow", "retrieval"],
+    "skills": ["Agent orchestration", "Vector retrieval"],
+    "time": "Day 1 14:00",
+    "availability": "18 seats left",
+    "recommendedFor": ["frontend builders", "product builders", "agent prototypes"]
+  },
+  {
+    "id": "onchain-credentials-clinic",
+    "title": "On-chain Credentials Clinic",
+    "tags": ["credentials", "attestations", "identity"],
+    "skills": ["On-chain credentials"],
+    "time": "Day 3 11:00",
+    "availability": "12 seats left",
+    "recommendedFor": ["skill graph projects", "identity projects"]
+  },
+  {
+    "id": "demo-day-story-sprint",
+    "title": "Demo Day Story Sprint",
+    "tags": ["pitch", "story", "demo"],
+    "skills": ["Product Design"],
+    "time": "Day 4 16:00",
+    "availability": "Open",
+    "recommendedFor": ["all finalist teams"]
+  },
+  {
+    "id": "retrieval-evals-workshop",
+    "title": "Retrieval Evals Workshop",
+    "tags": ["retrieval", "evals", "quality"],
+    "skills": ["Vector retrieval"],
+    "time": "Day 2 10:00",
+    "availability": "8 seats left",
+    "recommendedFor": ["RAG projects", "agent copilots"]
+  },
+  {
+    "id": "sponsor-api-faststart",
+    "title": "Sponsor API Faststart",
+    "tags": ["sponsors", "api", "credits"],
+    "skills": ["Agent orchestration", "Vector retrieval"],
+    "time": "Day 1 17:00",
+    "availability": "Open",
+    "sponsor": "Vector DB starter pack",
+    "recommendedFor": ["teams using sponsor infrastructure"]
+  }
+]

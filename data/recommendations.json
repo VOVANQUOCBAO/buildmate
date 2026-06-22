@@ -1,0 +1,80 @@
+[
+  {
+    "id": "agent-workflow-lab",
+    "title": "Agent Workflow Lab",
+    "category": "Workshop",
+    "action": "Reserve seat",
+    "goalKeywords": ["agentic", "workflow", "demo"],
+    "coversSkills": ["Agent orchestration", "Vector retrieval"],
+    "availabilityMatch": 0.95,
+    "eventTimingRelevance": 1,
+    "summary": "Hands-on workshop for composing agent steps, retrieval context, and demo-ready workflow loops.",
+    "detail": "This workshop should be the first stop because it directly converts Maya's frontend/product skills into an agentic workflow implementation path.",
+    "nextSteps": ["Reserve a seat", "Prepare one project question", "Capture reusable workflow patterns for the demo"]
+  },
+  {
+    "id": "omar-ai-infra",
+    "title": "Pair with Omar, AI infra engineer",
+    "category": "Team Match",
+    "action": "Request intro",
+    "goalKeywords": ["agentic", "workflow", "ship"],
+    "coversSkills": ["Vector retrieval", "Agent orchestration"],
+    "availabilityMatch": 0.82,
+    "eventTimingRelevance": 0.88,
+    "summary": "AI infrastructure teammate with retrieval, evals, and deployment experience.",
+    "detail": "Omar complements Maya's product/frontend strengths with the retrieval and deployment skills needed to ship a credible agent demo.",
+    "nextSteps": ["Request intro", "Share project scope", "Agree on one backend milestone"]
+  },
+  {
+    "id": "nina-devtools-pm",
+    "title": "Mentor: Nina, Developer Tools PM",
+    "category": "Mentor",
+    "action": "Book 15 min",
+    "goalKeywords": ["demo", "ship", "workflow"],
+    "coversSkills": ["Product Design", "Agent orchestration"],
+    "availabilityMatch": 0.78,
+    "eventTimingRelevance": 0.84,
+    "summary": "Developer tools product mentor who can help scope the MVP and Demo Day story.",
+    "detail": "Nina is useful after the first prototype exists because she can sharpen the MVP boundary and judge-facing story.",
+    "nextSteps": ["Book a 15 minute slot", "Bring prototype screenshots", "Ask for one cut and one demo improvement"]
+  },
+  {
+    "id": "vector-db-starter-pack",
+    "title": "Sponsor credits: Vector DB starter pack",
+    "category": "Sponsor",
+    "action": "Claim perk",
+    "goalKeywords": ["workflow", "demo"],
+    "coversSkills": ["Vector retrieval"],
+    "availabilityMatch": 1,
+    "eventTimingRelevance": 0.72,
+    "summary": "Sponsor resource that speeds up retrieval setup for an agentic workflow demo.",
+    "detail": "The starter pack removes infrastructure friction so the team can focus on recommendation quality and Demo Day polish.",
+    "nextSteps": ["Claim credits", "Load event docs", "Connect retrieval output to the recommendation engine"]
+  },
+  {
+    "id": "onchain-credentials-clinic",
+    "title": "On-chain Credentials Clinic",
+    "category": "Workshop",
+    "action": "Add to journey",
+    "goalKeywords": ["credentials", "demo", "ship"],
+    "coversSkills": ["On-chain credentials"],
+    "availabilityMatch": 0.7,
+    "eventTimingRelevance": 0.65,
+    "summary": "Workshop for issuing simple achievement or skill credentials after builder milestones.",
+    "detail": "This is a later-stage workshop for turning BuildMate ASG's skill graph into portable proof of builder progress.",
+    "nextSteps": ["Add to Day 3 journey", "Identify one credential event", "Prototype a simple achievement schema"]
+  },
+  {
+    "id": "priya-smart-contract",
+    "title": "Meet Priya, smart contract builder",
+    "category": "Team Match",
+    "action": "Request intro",
+    "goalKeywords": ["credentials", "ship"],
+    "coversSkills": ["On-chain credentials"],
+    "availabilityMatch": 0.76,
+    "eventTimingRelevance": 0.7,
+    "summary": "Smart contract teammate who can help turn skill achievements into verifiable credentials.",
+    "detail": "Priya is a good stretch teammate if the team decides to add on-chain skill credentials to the demo scope.",
+    "nextSteps": ["Request intro", "Validate credential scope", "Decide if on-chain proof belongs in MVP"]
+  }
+]

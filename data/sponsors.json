@@ -1,0 +1,38 @@
+[
+  {
+    "id": "vector-db-starter-pack",
+    "title": "Vector DB Starter Pack",
+    "tags": ["credits", "retrieval", "rag"],
+    "skills": ["Vector retrieval"],
+    "availability": "$500 credits",
+    "sponsor": "Vector DB",
+    "recommendedFor": ["retrieval workflows", "agent memory"]
+  },
+  {
+    "id": "agent-observability-kit",
+    "title": "Agent Observability Kit",
+    "tags": ["tracing", "evals", "debugging"],
+    "skills": ["Agent orchestration"],
+    "availability": "Free build-week access",
+    "sponsor": "AgentOps",
+    "recommendedFor": ["agent workflow demos"]
+  },
+  {
+    "id": "wallet-credential-sandbox",
+    "title": "Wallet Credential Sandbox",
+    "tags": ["wallet", "credentials", "identity"],
+    "skills": ["On-chain credentials"],
+    "availability": "Testnet support",
+    "sponsor": "Wallet infra partner",
+    "recommendedFor": ["achievement tracking", "portable profiles"]
+  },
+  {
+    "id": "demo-hosting-credits",
+    "title": "Demo Hosting Credits",
+    "tags": ["deployment", "hosting", "demo"],
+    "skills": ["Product Design"],
+    "availability": "$100 credits",
+    "sponsor": "Cloud sponsor",
+    "recommendedFor": ["Demo Day readiness"]
+  }
+]

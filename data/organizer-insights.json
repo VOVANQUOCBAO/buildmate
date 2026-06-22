@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Top skill gap",
+    "value": "Agent orchestration",
+    "note": "Most recommended resources close agent workflow gaps."
+  },
+  {
+    "label": "Workshop demand",
+    "value": "Agent Workflow Lab",
+    "note": "Highest-ranked workshop for frontend/product builders."
+  },
+  {
+    "label": "Mentor demand",
+    "value": "Product scoping",
+    "note": "Builders need help turning prototypes into Demo Day stories."
+  },
+  {
+    "label": "Sponsor pull",
+    "value": "Vector credits",
+    "note": "Retrieval infrastructure is the most useful sponsor resource."
+  }
+]

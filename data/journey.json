@@ -1,0 +1,38 @@
+[
+  {
+    "phase": "Day 1",
+    "title": "Choose direction",
+    "description": "Clarify the user problem, select workshops, and find missing teammate skills.",
+    "status": "now",
+    "recommendedResourceId": "agent-workflow-lab",
+    "recommendedResourceTitle": "Agent Workflow Lab",
+    "recommendedResourceHref": "/workshops/agent-workflow-lab"
+  },
+  {
+    "phase": "Day 2",
+    "title": "Prototype the agent loop",
+    "description": "Turn event knowledge, sponsor APIs, and builder goals into a working assistant flow.",
+    "status": "next",
+    "recommendedResourceId": "omar-ai-infra",
+    "recommendedResourceTitle": "Omar, AI infra engineer",
+    "recommendedResourceHref": "#recommendations"
+  },
+  {
+    "phase": "Day 3",
+    "title": "Validate recommendations",
+    "description": "Test skill-gap, mentor, and workshop recommendations with real builder scenarios.",
+    "status": "later",
+    "recommendedResourceId": "nina-devtools-pm",
+    "recommendedResourceTitle": "Mentor: Nina",
+    "recommendedResourceHref": "/mentors/nina-devtools-pm"
+  },
+  {
+    "phase": "Day 4",
+    "title": "Package Demo Day story",
+    "description": "Prepare the pitch, product walkthrough, and proof that BuildMate ASG saves builder time.",
+    "status": "later",
+    "recommendedResourceId": "demo-day-story-sprint",
+    "recommendedResourceTitle": "Demo Day Story Sprint",
+    "recommendedResourceHref": "#recommendations"
+  }
+]

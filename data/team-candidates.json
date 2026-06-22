@@ -1,0 +1,34 @@
+[
+  {
+    "id": "omar-ai-infra",
+    "title": "Omar, AI infra engineer",
+    "tags": ["retrieval", "evals", "deployment"],
+    "skills": ["Vector retrieval", "Agent orchestration"],
+    "availability": "Looking for frontend/product teammate",
+    "recommendedFor": ["agent workflow teams"]
+  },
+  {
+    "id": "priya-smart-contract",
+    "title": "Priya, smart contract builder",
+    "tags": ["solidity", "credentials", "testnet"],
+    "skills": ["On-chain credentials"],
+    "availability": "Available Day 2-4",
+    "recommendedFor": ["credential and identity projects"]
+  },
+  {
+    "id": "sam-product-designer",
+    "title": "Sam, product designer",
+    "tags": ["ux", "demo", "research"],
+    "skills": ["Product Design"],
+    "availability": "Open to join small team",
+    "recommendedFor": ["user-facing demos"]
+  },
+  {
+    "id": "ivy-agent-evals",
+    "title": "Ivy, agent evals engineer",
+    "tags": ["evals", "quality", "agents"],
+    "skills": ["Agent orchestration"],
+    "availability": "Available for review sessions",
+    "recommendedFor": ["agent quality and reliability"]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Event resources",
+    "value": "22",
+    "note": "Workshops, mentors, teammates, sponsors, deadlines"
+  },
+  {
+    "label": "Builder route",
+    "value": "4 linked steps",
+    "note": "Each journey phase points to a resource"
+  },
+  {
+    "label": "Decision layer",
+    "value": "Skill Graph",
+    "note": "Context beats generic chat"
+  },
+  {
+    "label": "Demo focus",
+    "value": "<2 min",
+    "note": "Demo path is optimized for judges"
+  }
+]

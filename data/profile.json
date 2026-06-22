@@ -1,0 +1,7 @@
+{
+  "name": "Maya Chen",
+  "role": "Full-stack builder",
+  "goal": "Ship an agentic workflow demo before Demo Day",
+  "currentSkills": ["React", "TypeScript", "Product Design"],
+  "targetSkills": ["Agent orchestration", "Vector retrieval", "On-chain credentials"]
+}

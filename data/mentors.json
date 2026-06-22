@@ -1,0 +1,38 @@
+[
+  {
+    "id": "nina-devtools-pm",
+    "title": "Nina, Developer Tools PM",
+    "tags": ["product", "developer tools", "demo story"],
+    "skills": ["Product Design", "Agent orchestration"],
+    "time": "Day 3 afternoon",
+    "availability": "3 slots",
+    "recommendedFor": ["MVP scoping", "Demo Day narrative"]
+  },
+  {
+    "id": "leo-agent-architect",
+    "title": "Leo, Agent Architect",
+    "tags": ["agents", "architecture", "orchestration"],
+    "skills": ["Agent orchestration"],
+    "time": "Day 2 evening",
+    "availability": "2 slots",
+    "recommendedFor": ["agent workflow design"]
+  },
+  {
+    "id": "amira-growth-mentor",
+    "title": "Amira, Community Growth Mentor",
+    "tags": ["community", "launch", "positioning"],
+    "skills": ["Product Design"],
+    "time": "Day 4 morning",
+    "availability": "5 slots",
+    "recommendedFor": ["launch strategy", "user discovery"]
+  },
+  {
+    "id": "kai-credential-engineer",
+    "title": "Kai, Credential Protocol Engineer",
+    "tags": ["credentials", "on-chain", "attestations"],
+    "skills": ["On-chain credentials"],
+    "time": "Day 3 afternoon",
+    "availability": "2 slots",
+    "recommendedFor": ["on-chain achievement tracking"]
+  }
+]

@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f6fbff;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --line: rgba(15, 23, 42, 0.1);
+  --cyan: #67e8f9;
+  --violet: #a78bfa;
+  --amber: #facc15;
+  --emerald: #6ee7b7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 8% 8%, rgba(103, 232, 249, 0.28), transparent 30%),
+    radial-gradient(circle at 82% 0%, rgba(167, 139, 250, 0.22), transparent 26%),
+    linear-gradient(180deg, #fbfdff 0%, var(--background) 42%, #eef8ff 100%);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.grid-paper {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.section-hero {
+  background:
+    radial-gradient(circle at 14% 18%, rgba(103, 232, 249, 0.28), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(239, 248, 255, 0.82));
+}
+
+.section-copilot {
+  background:
+    radial-gradient(circle at 88% 12%, rgba(167, 139, 250, 0.18), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+}
+
+.section-recommendations {
+  background:
+    radial-gradient(circle at 8% 10%, rgba(110, 231, 183, 0.16), transparent 28%),
+    linear-gradient(180deg, #f7fffb 0%, #eefcf7 100%);
+}
+
+.section-journey {
+  background:
+    radial-gradient(circle at 85% 8%, rgba(250, 204, 21, 0.18), transparent 26%),
+    linear-gradient(180deg, #fffdf3 0%, #fff8dd 100%);
+}
+
+.section-organizer {
+  background: linear-gradient(180deg, #101827 0%, #1e1b4b 100%);
+}
+
+.section-proof {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(167, 139, 250, 0.12), transparent 28%),
+    linear-gradient(180deg, #f8f7ff 0%, #f1f5ff 100%);
+}
+
+.section-launch {
+  background:
+    radial-gradient(circle at 75% 12%, rgba(103, 232, 249, 0.16), transparent 28%),
+    linear-gradient(180deg, #eef8ff 0%, #e7f0ff 100%);
+}
+
+.glass-panel {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.64));
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(20px);
+}
+
+.dark-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(circle at top right, rgba(103, 232, 249, 0.18), transparent 34%),
+    linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);
+  color: #f8fafc;
+  box-shadow: 0 32px 100px rgba(15, 23, 42, 0.28);
+}
+
+.soft-ring {
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 18px 48px rgba(15, 23, 42, 0.08);
+}

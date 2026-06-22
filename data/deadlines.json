@@ -1,0 +1,42 @@
+[
+  {
+    "id": "team-formation",
+    "title": "Team formation cutoff",
+    "tags": ["deadline", "team"],
+    "skills": [],
+    "time": "Day 1 20:00",
+    "recommendedFor": ["solo builders", "incomplete teams"]
+  },
+  {
+    "id": "prototype-checkpoint",
+    "title": "Prototype checkpoint",
+    "tags": ["deadline", "prototype"],
+    "skills": ["Agent orchestration"],
+    "time": "Day 2 18:00",
+    "recommendedFor": ["agent workflow demos"]
+  },
+  {
+    "id": "mentor-review",
+    "title": "Mentor review window",
+    "tags": ["deadline", "mentor"],
+    "skills": ["Product Design"],
+    "time": "Day 3 15:00",
+    "recommendedFor": ["teams preparing Demo Day story"]
+  },
+  {
+    "id": "submission-freeze",
+    "title": "Submission freeze",
+    "tags": ["deadline", "submission"],
+    "skills": [],
+    "time": "Day 4 22:00",
+    "recommendedFor": ["all teams"]
+  },
+  {
+    "id": "demo-day",
+    "title": "Demo Day",
+    "tags": ["deadline", "pitch"],
+    "skills": ["Product Design"],
+    "time": "Day 5 10:00",
+    "recommendedFor": ["all teams"]
+  }
+]
