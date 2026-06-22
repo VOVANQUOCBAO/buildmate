@@ -1,5 +1,5 @@
 import { getProfile } from "@/lib/buildmate-data";
-import { getDbProfile, upsertDbProfile } from "@/lib/supabase/user-data";
+import { getCurrentUser, getDbProfile, upsertDbProfile } from "@/lib/supabase/user-data";
 import type { BuilderProfile } from "@/lib/types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -43,6 +43,13 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Invalid profile payload" }, { status: 400 });
   }
 
-  const saved = await upsertDbProfile(profile);
+  // Name is the account identity, taken from the session — not the client body.
+  // This keeps a placeholder like "Maya Chen" from ever being persisted.
+  const user = await getCurrentUser();
+  const authName = user
+    ? (typeof user.user_metadata?.name === "string" && user.user_metadata.name) || user.email || profile.name
+    : profile.name;
+
+  const saved = await upsertDbProfile({ ...profile, name: authName });
   return NextResponse.json({ saved });
 }

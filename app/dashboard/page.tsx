@@ -21,10 +21,19 @@ export default async function DashboardPage() {
 
   const profile = await getDbProfile();
 
+  // The builder's name is their account identity, never client-supplied profile
+  // data — this keeps a stale/placeholder stored name (e.g. an old "Maya Chen"
+  // onboarding row) from ever showing on the personal dashboard.
+  const personalProfile = profile ? { ...profile, name: displayName } : null;
+
   return (
     <main className="grid-paper min-h-screen overflow-hidden">
       <DashboardHeader name={displayName} />
-      {profile ? <BuildMateAsgDashboard personalProfile={profile} /> : <EmptyState name={displayName} />}
+      {personalProfile ? (
+        <BuildMateAsgDashboard personalProfile={personalProfile} />
+      ) : (
+        <EmptyState name={displayName} />
+      )}
     </main>
   );
 }
