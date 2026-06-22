@@ -1,7 +1,9 @@
-import { getRecommendationById } from "@/lib/buildmate-data";
+import { generateExplanation } from "@/lib/ai/explain";
+import { getProfile, getRecommendationById } from "@/lib/buildmate-data";
+import { getDbProfile } from "@/lib/supabase/user-data";
 import { NextRequest, NextResponse } from "next/server";
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id");
 
   if (!id) {
@@ -14,10 +16,15 @@ export function GET(request: NextRequest) {
     return NextResponse.json({ error: `Unknown recommendation id: ${id}` }, { status: 404 });
   }
 
+  // Ground in the signed-in builder's DB profile when available, else fixture.
+  const profile = (await getDbProfile()) ?? getProfile();
+  const result = await generateExplanation(recommendation, profile);
+
   return NextResponse.json({
     id,
     engineVersion: recommendation.engineVersion,
-    explanation: `${recommendation.title} is recommended because it scores ${recommendation.score}/100 across goal fit, skill-gap coverage, timing, and availability. ${recommendation.detail}`,
-    nextSteps: recommendation.nextSteps
+    explanation: result.explanation,
+    nextSteps: result.nextSteps,
+    source: result.source
   });
 }
