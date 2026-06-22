@@ -1,12 +1,38 @@
 import { Badge } from "@/components/badge";
 import { BuildMateAsgDashboard } from "@/components/buildmate-dashboard";
+import { PersonalizePrompt } from "@/components/personalize-prompt";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser, getDbProfile } from "@/lib/supabase/user-data";
 
-export default function Home() {
+export default async function Home() {
+  // Resolve auth + saved profile on the server so unfilled signed-in builders
+  // never receive the demo's skill graph / recommendations in the first place.
+  const user = await getCurrentUser();
+  const profile = user ? await getDbProfile() : null;
+
+  const displayName = user
+    ? (typeof user.user_metadata?.name === "string" && user.user_metadata.name) ||
+      user.email ||
+      "Builder"
+    : "Builder";
+
+  // The builder's name is their account identity, not stored profile data —
+  // this keeps a stale "Maya Chen" onboarding row from showing on /.
+  const personalProfile = profile ? { ...profile, name: displayName } : null;
+
   return (
     <main className="grid-paper min-h-screen overflow-hidden">
       <Header />
-      <BuildMateAsgDashboard />
+      {!user ? (
+        // Guest: keep the public Maya Chen demo (+ localStorage personalization).
+        <BuildMateAsgDashboard />
+      ) : personalProfile ? (
+        // Signed in with a filled profile: show their own data.
+        <BuildMateAsgDashboard personalProfile={personalProfile} />
+      ) : (
+        // Signed in but nothing entered yet: gentle invite, no demo data.
+        <PersonalizePrompt name={displayName} />
+      )}
       <Launch />
     </main>
   );
