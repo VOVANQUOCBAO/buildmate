@@ -11,8 +11,12 @@ import {
   decodeProfile,
   encodeProfile
 } from "@/lib/profile-storage";
+import {
+  listJourneyProgress as fetchJourneyProgress,
+  setJourneyStatus as persistJourneyStatus
+} from "@/lib/journey-progress-store";
 import { listSavedActions, toggleSavedAction } from "@/lib/saved-actions-store";
-import type { BuilderProfile, DashboardData, Recommendation } from "@/lib/types";
+import type { BuilderProfile, DashboardData, JourneyStatus, Recommendation } from "@/lib/types";
 
 type LoadState = "idle" | "loading" | "ready" | "error";
 type RecommendationFilter = {
@@ -35,12 +39,19 @@ export function BuildMateAsgDashboard() {
   const [recommendationFilter, setRecommendationFilter] = useState("all");
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [progressByPhase, setProgressByPhase] = useState<Record<string, JourneyStatus>>({});
   const [error, setError] = useState<string | null>(null);
 
   const refreshSaved = useCallback(async () => {
     const actions = await listSavedActions();
     setSavedIds(new Set(actions.map((action) => action.recommendationId)));
   }, []);
+
+  const cycleJourneyStatus = async (phase: string, next: JourneyStatus) => {
+    setProgressByPhase((prev) => ({ ...prev, [phase]: next })); // optimistic
+    const list = await persistJourneyStatus(phase, next);
+    setProgressByPhase(Object.fromEntries(list.map((p) => [p.phase, p.status])));
+  };
 
   const toggleSave = useCallback(async (recommendation: Recommendation) => {
     const { actions } = await toggleSavedAction({
@@ -106,6 +117,11 @@ export function BuildMateAsgDashboard() {
     const timer = window.setTimeout(() => {
       void loadDashboard();
       void refreshSaved();
+      void fetchJourneyProgress().then((list) => {
+        setProgressByPhase(
+          Object.fromEntries(list.map((p) => [p.phase, p.status]))
+        );
+      });
     }, 0);
 
     return () => window.clearTimeout(timer);
@@ -154,7 +170,7 @@ export function BuildMateAsgDashboard() {
         savedIds={savedIds}
         onToggleSave={toggleSave}
       />
-      <Journey data={data} />
+      <Journey data={data} progressByPhase={progressByPhase} onCycleStatus={cycleJourneyStatus} />
       <OrganizerInsights data={data} />
       <Proof data={data} />
     </>
@@ -359,7 +375,15 @@ function Recommendations({
   );
 }
 
-function Journey({ data }: { data: DashboardData }) {
+function Journey({
+  data,
+  progressByPhase,
+  onCycleStatus
+}: {
+  data: DashboardData;
+  progressByPhase: Record<string, JourneyStatus>;
+  onCycleStatus: (phase: string, next: JourneyStatus) => void;
+}) {
   return (
     <section id="journey" className="section-journey border-b border-slate-950/10">
       <div className="mx-auto max-w-7xl px-6 py-16">
@@ -374,7 +398,11 @@ function Journey({ data }: { data: DashboardData }) {
             BuildMate ASG compresses event overload into a practical route from registration to Demo Day.
           </p>
         </div>
-        <JourneyTimeline steps={data.journey} />
+        <JourneyTimeline
+          steps={data.journey}
+          progressByPhase={progressByPhase}
+          onCycleStatus={(phase, next) => void onCycleStatus(phase, next)}
+        />
       </div>
     </section>
   );
