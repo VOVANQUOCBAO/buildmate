@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -22,10 +22,11 @@ const helpOptions = ["Workshops", "Team matches", "Mentors", "Sponsor resources"
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [role, setRole] = useState("Full-stack builder");
-  const [goal, setGoal] = useState("Ship an agentic workflow demo before Demo Day");
-  const [skills, setSkills] = useState<string[]>(["React", "TypeScript", "Product Design"]);
-  const [needs, setNeeds] = useState<string[]>(["Workshops", "Team matches"]);
+  const [role, setRole] = useState("");
+  const [goal, setGoal] = useState("");
+  const [skills, setSkills] = useState<string[]>([]);
+  const [targetSkills, setTargetSkills] = useState<string[]>([]);
+  const [needs, setNeeds] = useState<string[]>([]);
   const [saved, setSaved] = useState(false);
   const [builderName, setBuilderName] = useState("Maya Chen");
   const [signedIn, setSignedIn] = useState(false);
@@ -45,21 +46,28 @@ export default function OnboardingPage() {
     });
   }, []);
 
-  const missingSkills = useMemo(() => {
-    return skillOptions.filter((skill) => !skills.includes(skill)).slice(0, 3);
-  }, [skills]);
+  // A profile only counts as "filled" once the builder gives real input — role,
+  // goal, at least one current skill, and at least one skill they want to build.
+  // targetSkills is what drives the recommendation engine, so it must be chosen
+  // explicitly rather than inferred from the skills left unticked.
+  const canSave =
+    role.trim().length > 0 &&
+    goal.trim().length > 0 &&
+    skills.length > 0 &&
+    targetSkills.length > 0;
 
   function toggleValue(value: string, values: string[], setValues: (next: string[]) => void) {
     setValues(values.includes(value) ? values.filter((item) => item !== value) : [...values, value]);
   }
 
   async function saveProfile() {
+    if (!canSave) return;
     const profile: BuilderProfile = {
       name: builderName,
       role,
       goal,
       currentSkills: skills,
-      targetSkills: missingSkills
+      targetSkills
     };
 
     // Always keep the local copy so the demo + offline flow works instantly.
@@ -106,6 +114,7 @@ export default function OnboardingPage() {
               <input
                 value={role}
                 onChange={(event) => setRole(event.target.value)}
+                placeholder="e.g. Full-stack builder"
                 className="mt-2 w-full rounded-2xl border border-slate-950/10 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-400"
               />
             </label>
@@ -116,6 +125,7 @@ export default function OnboardingPage() {
                 value={goal}
                 onChange={(event) => setGoal(event.target.value)}
                 rows={4}
+                placeholder="e.g. Ship an agentic workflow demo before Demo Day"
                 className="mt-2 w-full rounded-2xl border border-slate-950/10 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-400"
               />
             </label>
@@ -124,7 +134,8 @@ export default function OnboardingPage() {
               <button
                 type="button"
                 onClick={() => void saveProfile()}
-                className="rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white"
+                disabled={!canSave}
+                className="rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Use this profile
               </button>
@@ -135,6 +146,12 @@ export default function OnboardingPage() {
                 Return to dashboard
               </Link>
             </div>
+
+            {!canSave ? (
+              <p className="mt-3 text-xs font-semibold text-slate-500">
+                Add your role, goal, at least one current skill, and at least one skill you want to build.
+              </p>
+            ) : null}
 
             {saved ? (
               <div className="mt-4 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-semibold text-cyan-950">
@@ -174,6 +191,24 @@ export default function OnboardingPage() {
             </div>
 
             <div className="mt-6">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/45">Skills you want to build</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {skillOptions.map((skill) => (
+                  <button
+                    key={skill}
+                    type="button"
+                    onClick={() => toggleValue(skill, targetSkills, setTargetSkills)}
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${
+                      targetSkills.includes(skill) ? "bg-amber-300 text-slate-950" : "bg-white/10 text-white/60"
+                    }`}
+                  >
+                    {skill}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/45">Help needed</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {helpOptions.map((need) => (
@@ -191,10 +226,6 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            <div className="mt-6 rounded-3xl bg-cyan-300 p-4 text-slate-950">
-              <p className="text-xs font-bold uppercase tracking-[0.18em]">Detected skill gaps</p>
-              <p className="mt-2 text-sm font-semibold">{missingSkills.join(", ") || "No obvious gap selected."}</p>
-            </div>
           </div>
         </section>
       </div>

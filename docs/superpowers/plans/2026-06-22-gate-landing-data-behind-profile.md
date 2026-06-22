@@ -214,6 +214,171 @@ git commit -m "feat: gate landing-page data behind a completed profile"
 
 ---
 
+### Task 3: Make onboarding start empty and require real input
+
+**Why:** With the form pre-filled with defaults, a builder could click "Use this profile" without typing anything and still create a "filled" profile row — so the landing gate showed data even though they never entered their own info. This task makes onboarding start blank and blocks saving until role, goal, and at least one skill are genuinely provided, so a profile only counts as "filled" when the builder really filled it.
+
+**Files:**
+- Modify: `app/onboarding/page.tsx` (initial state, a `canSave` guard, the save handler, the submit button, and input placeholders)
+
+**Interfaces:**
+- Consumes: existing `BuilderProfile` shape and `saveProfile()` flow (unchanged contract — still PUTs to `/api/profile` and writes localStorage).
+- Produces: nothing consumed by other tasks. The downstream gate in `lib/supabase/user-data.ts` `hasContent()` is unchanged — it already treats a row with role/goal/skills as filled; this task simply stops empty rows from ever being created.
+
+- [ ] **Step 1: Start the form empty**
+
+In `app/onboarding/page.tsx`, the initial state is:
+
+```tsx
+  const [role, setRole] = useState("Full-stack builder");
+  const [goal, setGoal] = useState("Ship an agentic workflow demo before Demo Day");
+  const [skills, setSkills] = useState<string[]>(["React", "TypeScript", "Product Design"]);
+  const [needs, setNeeds] = useState<string[]>(["Workshops", "Team matches"]);
+```
+
+Replace it with:
+
+```tsx
+  const [role, setRole] = useState("");
+  const [goal, setGoal] = useState("");
+  const [skills, setSkills] = useState<string[]>([]);
+  const [needs, setNeeds] = useState<string[]>([]);
+```
+
+- [ ] **Step 2: Add a `canSave` guard**
+
+Immediately after the `missingSkills` `useMemo` block, add:
+
+```tsx
+  // A profile only counts as "filled" once the builder gives real input —
+  // role, goal, and at least one current skill. This is what stops an empty /
+  // default profile from unlocking the dashboard.
+  const canSave = role.trim().length > 0 && goal.trim().length > 0 && skills.length > 0;
+```
+
+- [ ] **Step 3: Block `saveProfile` when not ready**
+
+The `saveProfile` function starts with:
+
+```tsx
+  async function saveProfile() {
+    const profile: BuilderProfile = {
+```
+
+Insert the guard as its first line:
+
+```tsx
+  async function saveProfile() {
+    if (!canSave) return;
+    const profile: BuilderProfile = {
+```
+
+- [ ] **Step 4: Add placeholders to the empty inputs**
+
+The role input is:
+
+```tsx
+              <input
+                value={role}
+                onChange={(event) => setRole(event.target.value)}
+                className="mt-2 w-full rounded-2xl border border-slate-950/10 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-400"
+              />
+```
+
+Add a placeholder:
+
+```tsx
+              <input
+                value={role}
+                onChange={(event) => setRole(event.target.value)}
+                placeholder="e.g. Full-stack builder"
+                className="mt-2 w-full rounded-2xl border border-slate-950/10 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-400"
+              />
+```
+
+The goal textarea is:
+
+```tsx
+              <textarea
+                value={goal}
+                onChange={(event) => setGoal(event.target.value)}
+                rows={4}
+                className="mt-2 w-full rounded-2xl border border-slate-950/10 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-400"
+              />
+```
+
+Add a placeholder:
+
+```tsx
+              <textarea
+                value={goal}
+                onChange={(event) => setGoal(event.target.value)}
+                rows={4}
+                placeholder="e.g. Ship an agentic workflow demo before Demo Day"
+                className="mt-2 w-full rounded-2xl border border-slate-950/10 bg-white px-4 py-3 text-sm outline-none focus:border-cyan-400"
+              />
+```
+
+- [ ] **Step 5: Disable the submit button + add a hint until the form is valid**
+
+The submit button block is:
+
+```tsx
+              <button
+                type="button"
+                onClick={() => void saveProfile()}
+                className="rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white"
+              >
+                Use this profile
+              </button>
+```
+
+Replace it with (adds `disabled` + disabled styling):
+
+```tsx
+              <button
+                type="button"
+                onClick={() => void saveProfile()}
+                disabled={!canSave}
+                className="rounded-full bg-slate-950 px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Use this profile
+              </button>
+```
+
+Then, directly after the closing `</div>` of the buttons row (the `<div className="mt-6 flex flex-col gap-3 sm:flex-row">...</div>`), add a hint:
+
+```tsx
+            {!canSave ? (
+              <p className="mt-3 text-xs font-semibold text-slate-500">
+                Add your role, goal, and at least one current skill to continue.
+              </p>
+            ) : null}
+```
+
+- [ ] **Step 6: Verify lint + build pass**
+
+Run: `npm run lint && npm run build`
+Expected: PASS, no type errors.
+
+- [ ] **Step 7: Manual verification**
+
+With `npm run dev` running and signed in on an account whose profile row was deleted (or a fresh account):
+1. Open `/onboarding` → role and goal fields are empty (showing placeholders), no skills selected, "Use this profile" is disabled, hint is visible.
+2. Type a role, a goal, and select one skill → button enables, hint disappears.
+3. Click "Use this profile" → redirected to `/dashboard` showing your data.
+4. Open `/` → your live profile data shows (no invite).
+5. Sign out / fresh account with no profile → `/` shows the "One quick step" invite, `/onboarding` is empty and cannot be saved blank.
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add app/onboarding/page.tsx
+git commit -m "feat: require real onboarding input before a profile counts as filled"
+```
+
+---
+
 ## Self-Review
 
 **1. Spec coverage**
