@@ -64,6 +64,12 @@ async function AccountControls() {
 
   return (
     <div className="flex items-center gap-2">
+      <a
+        href="/dashboard"
+        className="rounded-full border border-slate-950/10 bg-white/70 px-5 py-3 text-sm font-bold text-slate-950 hover:border-slate-950/30"
+      >
+        Dashboard
+      </a>
       <span className="hidden max-w-[12rem] truncate rounded-full border border-slate-950/10 bg-white/70 px-4 py-2.5 text-sm font-bold text-slate-700 sm:inline">
         {label}
       </span>

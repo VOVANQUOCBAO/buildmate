@@ -32,7 +32,16 @@ const recommendationFilters: RecommendationFilter[] = [
   { label: "Sponsors", type: "sponsor" }
 ];
 
-export function BuildMateAsgDashboard() {
+export function BuildMateAsgDashboard({
+  personalProfile
+}: {
+  /**
+   * When provided (personal `/dashboard` mode), the dashboard is scoped to this
+   * profile only: localStorage and the Maya Chen demo fixture are ignored, so a
+   * signed-in builder always sees their own data.
+   */
+  personalProfile?: BuilderProfile;
+} = {}) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [activeProfile, setActiveProfile] = useState<BuilderProfile | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("idle");
@@ -41,6 +50,14 @@ export function BuildMateAsgDashboard() {
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [progressByPhase, setProgressByPhase] = useState<Record<string, JourneyStatus>>({});
   const [error, setError] = useState<string | null>(null);
+
+  const isPersonal = personalProfile !== undefined;
+
+  // Personal mode is scoped to the signed-in profile; demo mode reads localStorage.
+  const resolveProfile = useCallback(
+    (): BuilderProfile | null => (isPersonal ? personalProfile ?? null : readStoredProfile()),
+    [isPersonal, personalProfile]
+  );
 
   const refreshSaved = useCallback(async () => {
     const actions = await listSavedActions();
@@ -68,7 +85,7 @@ export function BuildMateAsgDashboard() {
     setError(null);
 
     try {
-      const storedProfile = readStoredProfile();
+      const storedProfile = resolveProfile();
       const response = await fetch(`/api/dashboard${profileQuery(storedProfile)}`);
       if (!response.ok) {
         throw new Error(`Dashboard API returned ${response.status}`);
@@ -83,14 +100,14 @@ export function BuildMateAsgDashboard() {
       setError(err instanceof Error ? err.message : "Could not load BuildMate ASG dashboard data");
       setLoadState("error");
     }
-  }, []);
+  }, [resolveProfile]);
 
   const loadRecommendations = useCallback(async (type: string) => {
     setRecommendationsLoading(true);
     setError(null);
 
     try {
-      const storedProfile = readStoredProfile();
+      const storedProfile = resolveProfile();
       const response = await fetch(`/api/recommendations?type=${type}${profileQuery(storedProfile, "&")}`);
       if (!response.ok) {
         throw new Error(`Recommendations API returned ${response.status}`);
@@ -106,7 +123,7 @@ export function BuildMateAsgDashboard() {
     } finally {
       setRecommendationsLoading(false);
     }
-  }, []);
+  }, [resolveProfile]);
 
   const resetProfile = useCallback(async () => {
     window.localStorage.removeItem(BUILDMATE_PROFILE_STORAGE_KEY);
@@ -157,6 +174,7 @@ export function BuildMateAsgDashboard() {
       <Hero
         data={data}
         activeProfile={activeProfile}
+        isPersonal={isPersonal}
         onRefresh={loadDashboard}
         onResetProfile={resetProfile}
         isRefreshing={loadState === "loading"}
@@ -180,12 +198,14 @@ export function BuildMateAsgDashboard() {
 function Hero({
   data,
   activeProfile,
+  isPersonal,
   onRefresh,
   onResetProfile,
   isRefreshing
 }: {
   data: DashboardData;
   activeProfile: BuilderProfile | null;
+  isPersonal: boolean;
   onRefresh: () => Promise<void>;
   onResetProfile: () => Promise<void>;
   isRefreshing: boolean;
@@ -197,7 +217,9 @@ function Hero({
           <div className="flex flex-wrap gap-3">
             <Badge>Agentic build week</Badge>
             <Badge tone="violet">Skill Graph</Badge>
-            <Badge tone="amber">{activeProfile ? "Personalized from onboarding" : "API-backed demo"}</Badge>
+            <Badge tone="amber">
+              {isPersonal ? "Your live profile" : activeProfile ? "Personalized from onboarding" : "API-backed demo"}
+            </Badge>
           </div>
           <h1 className="mt-8 max-w-5xl text-6xl font-black tracking-[-0.06em] text-slate-950 md:text-8xl">
             The shortest path from learning to shipping.
@@ -217,7 +239,7 @@ function Hero({
             >
               {isRefreshing ? "Refreshing..." : "Refresh API data"}
             </button>
-            {activeProfile ? (
+            {activeProfile && !isPersonal ? (
               <button
                 type="button"
                 onClick={() => void onResetProfile()}

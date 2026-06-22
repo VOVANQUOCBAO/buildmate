@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Badge } from "@/components/badge";
 import { BUILDMATE_PROFILE_STORAGE_KEY } from "@/lib/profile-storage";
+import { createClient } from "@/lib/supabase/client";
 import type { BuilderProfile } from "@/lib/types";
 
 const skillOptions = [
@@ -19,11 +21,29 @@ const skillOptions = [
 const helpOptions = ["Workshops", "Team matches", "Mentors", "Sponsor resources"];
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const [role, setRole] = useState("Full-stack builder");
   const [goal, setGoal] = useState("Ship an agentic workflow demo before Demo Day");
   const [skills, setSkills] = useState<string[]>(["React", "TypeScript", "Product Design"]);
   const [needs, setNeeds] = useState<string[]>(["Workshops", "Team matches"]);
   const [saved, setSaved] = useState(false);
+  const [builderName, setBuilderName] = useState("Maya Chen");
+  const [signedIn, setSignedIn] = useState(false);
+
+  // Prefill the builder's real name (and detect sign-in) from the Supabase session.
+  useEffect(() => {
+    const supabase = createClient();
+    if (!supabase) return;
+
+    void supabase.auth.getUser().then(({ data }) => {
+      const user = data.user;
+      if (!user) return;
+      setSignedIn(true);
+      setBuilderName(
+        (typeof user.user_metadata?.name === "string" && user.user_metadata.name) || user.email || "Builder"
+      );
+    });
+  }, []);
 
   const missingSkills = useMemo(() => {
     return skillOptions.filter((skill) => !skills.includes(skill)).slice(0, 3);
@@ -35,7 +55,7 @@ export default function OnboardingPage() {
 
   async function saveProfile() {
     const profile: BuilderProfile = {
-      name: "Maya Chen",
+      name: builderName,
       role,
       goal,
       currentSkills: skills,
@@ -48,11 +68,16 @@ export default function OnboardingPage() {
 
     // Persist to the database too when signed in (no-op response otherwise).
     try {
-      await fetch("/api/profile", {
+      const response = await fetch("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profile)
       });
+      const result = (await response.json().catch(() => null)) as { saved?: boolean } | null;
+      // When the profile was persisted for a signed-in user, send them to their dashboard.
+      if (result?.saved) {
+        router.push("/dashboard");
+      }
     } catch {
       // Network/DB unavailable — local copy already saved, so this is non-fatal.
     }
@@ -113,14 +138,20 @@ export default function OnboardingPage() {
 
             {saved ? (
               <div className="mt-4 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm font-semibold text-cyan-950">
-                Profile saved. Return to the dashboard to see personalized scoring.
+                {signedIn ? (
+                  <>
+                    Profile saved. <Link href="/dashboard" className="underline">Open your dashboard →</Link>
+                  </>
+                ) : (
+                  "Profile saved locally. Sign in to sync it and unlock your personal dashboard."
+                )}
               </div>
             ) : null}
           </div>
 
           <div className="dark-card rounded-[2rem] p-6">
             <Badge tone="dark">Profile preview</Badge>
-            <h2 className="mt-4 text-3xl font-black tracking-[-0.04em]">Maya Chen</h2>
+            <h2 className="mt-4 text-3xl font-black tracking-[-0.04em]">{builderName}</h2>
             <p className="mt-2 text-cyan-100">{role}</p>
             <p className="mt-5 rounded-3xl bg-white/[0.06] p-4 text-sm leading-6 text-white/70">{goal}</p>
 
