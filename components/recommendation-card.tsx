@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 
 import type { Recommendation } from "@/lib/types";
 
@@ -79,8 +82,68 @@ export function RecommendationCard({
         </ul>
       </details>
 
+      <AiExplain id={recommendation.id} />
+
       <RecommendationAction recommendation={recommendation} />
     </article>
+  );
+}
+
+type AiState = "idle" | "loading" | "done" | "error";
+type AiResult = { explanation: string; nextSteps: string[]; source: string };
+
+function AiExplain({ id }: { id: string }) {
+  const [state, setState] = useState<AiState>("idle");
+  const [result, setResult] = useState<AiResult | null>(null);
+
+  async function run() {
+    setState("loading");
+    try {
+      const res = await fetch(`/api/explain?id=${encodeURIComponent(id)}`);
+      if (!res.ok) throw new Error("request failed");
+      const data = (await res.json()) as AiResult;
+      setResult({ explanation: data.explanation, nextSteps: data.nextSteps ?? [], source: data.source });
+      setState("done");
+    } catch {
+      setState("error");
+    }
+  }
+
+  if (state === "done" && result) {
+    return (
+      <div className="mt-4 rounded-2xl border border-violet-200 bg-violet-50/70 p-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-black uppercase tracking-[0.18em] text-violet-500">✨ AI explanation</span>
+          <span className="rounded-full bg-violet-200 px-2 py-0.5 text-[10px] font-bold text-violet-900">
+            {result.source === "groq" ? "Groq · Llama 3.3" : "fallback"}
+          </span>
+        </div>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{result.explanation}</p>
+        {result.nextSteps.length > 0 ? (
+          <ul className="mt-2 space-y-1 text-xs font-semibold text-slate-600">
+            {result.nextSteps.map((step) => (
+              <li key={step}>→ {step}</li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        onClick={run}
+        disabled={state === "loading"}
+        className="inline-flex items-center gap-2 rounded-full border border-violet-300 bg-violet-50 px-4 py-2 text-xs font-bold text-violet-900 transition hover:bg-violet-100 disabled:opacity-60"
+      >
+        {state === "loading" ? "Thinking…" : "✨ Explain with AI"}
+      </button>
+      {state === "error" ? (
+        <p className="mt-2 text-xs font-semibold text-rose-500">AI unavailable — please try again.</p>
+      ) : null}
+    </div>
   );
 }
 
