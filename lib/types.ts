@@ -91,3 +91,11 @@ export type DashboardData = {
   proofMetrics: ProofMetric[];
   organizerInsights: OrganizerInsight[];
 };
+
+export type JourneyStatus = "not_started" | "in_progress" | "done" | "blocked";
+
+export type JourneyProgress = {
+  phase: string;
+  status: JourneyStatus;
+  updatedAt: string;
+};
