@@ -1,24 +1,25 @@
-import Anthropic from "@anthropic-ai/sdk";
-
 import type { BuilderProfile, Recommendation } from "@/lib/types";
 
 /**
- * Claude explanation layer for the recommendation engine.
+ * AI explanation layer for the recommendation engine (Groq-backed).
  *
- * Claude only EXPLAINS and personalises a score the deterministic engine has
- * already computed — it never invents new recommendations. When
- * ANTHROPIC_API_KEY is absent or the call fails, we return the deterministic
- * template so the endpoint never breaks (graceful fallback, like the rest of
- * the app).
+ * The model only EXPLAINS and personalises a score the deterministic engine has
+ * already computed — it never invents new recommendations. When GROQ_API_KEY is
+ * absent or the call fails, we return the deterministic template so the endpoint
+ * never breaks (graceful fallback, like the rest of the app).
+ *
+ * Groq exposes an OpenAI-compatible Chat Completions API, so we call it with a
+ * plain fetch — no extra SDK dependency.
  */
 
 export type ExplainResult = {
   explanation: string;
   nextSteps: string[];
-  source: "claude" | "fallback";
+  source: "groq" | "fallback";
 };
 
-const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
 /** The deterministic template — identical in spirit to the old route output. */
 export function buildFallback(recommendation: Recommendation): ExplainResult {
@@ -60,15 +61,15 @@ export function buildExplainPrompt(
   ].join("\n");
 }
 
-type ParsedClaude = { explanation?: unknown; nextSteps?: unknown };
+type ParsedModel = { explanation?: unknown; nextSteps?: unknown };
 
-/** Tolerant parse of Claude's JSON; returns null if it isn't usable. */
-function parseClaudeJson(text: string): { explanation: string; nextSteps: string[] } | null {
+/** Tolerant parse of the model's JSON; returns null if it isn't usable. */
+function parseModelJson(text: string): { explanation: string; nextSteps: string[] } | null {
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
   if (start === -1 || end === -1 || end <= start) return null;
   try {
-    const parsed = JSON.parse(text.slice(start, end + 1)) as ParsedClaude;
+    const parsed = JSON.parse(text.slice(start, end + 1)) as ParsedModel;
     if (typeof parsed.explanation !== "string" || !parsed.explanation.trim()) return null;
     const nextSteps = Array.isArray(parsed.nextSteps)
       ? parsed.nextSteps.filter((s): s is string => typeof s === "string")
@@ -80,37 +81,54 @@ function parseClaudeJson(text: string): { explanation: string; nextSteps: string
 }
 
 /**
- * Returns a Claude-grounded explanation when ANTHROPIC_API_KEY is set and the
- * call + parse succeed; otherwise the deterministic fallback. Never throws.
+ * Returns a Groq-grounded explanation when GROQ_API_KEY is set and the call +
+ * parse succeed; otherwise the deterministic fallback. Never throws.
  */
 export async function generateExplanation(
   recommendation: Recommendation,
   profile: BuilderProfile
 ): Promise<ExplainResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return buildFallback(recommendation);
 
-  const model = process.env.ANTHROPIC_MODEL || DEFAULT_MODEL;
+  const model = process.env.GROQ_MODEL || DEFAULT_MODEL;
 
   try {
-    const client = new Anthropic({ apiKey });
-    const response = await client.messages.create({
-      model,
-      max_tokens: 400,
-      system:
-        "You ground every answer in the supplied builder profile and engine output. You never fabricate recommendations or facts. You reply with strict JSON only.",
-      messages: [{ role: "user", content: buildExplainPrompt(recommendation, profile) }]
+    const response = await fetch(GROQ_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 400,
+        temperature: 0.4,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "You ground every answer in the supplied builder profile and engine output. You never fabricate recommendations or facts. You reply with strict JSON only."
+          },
+          { role: "user", content: buildExplainPrompt(recommendation, profile) }
+        ]
+      })
     });
 
-    const block = response.content[0];
-    const text = block && block.type === "text" ? block.text : "";
-    const parsed = parseClaudeJson(text);
+    if (!response.ok) return buildFallback(recommendation);
+
+    const data = (await response.json()) as {
+      choices?: { message?: { content?: string } }[];
+    };
+    const text = data.choices?.[0]?.message?.content ?? "";
+    const parsed = parseModelJson(text);
     if (!parsed) return buildFallback(recommendation);
 
     return {
       explanation: parsed.explanation,
       nextSteps: parsed.nextSteps.length ? parsed.nextSteps : recommendation.nextSteps,
-      source: "claude"
+      source: "groq"
     };
   } catch {
     return buildFallback(recommendation);
